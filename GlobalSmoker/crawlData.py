@@ -80,10 +80,5 @@ def print_format(data):
 
 
 if __name__ == "__main__":
-    # smoke_num = crawl()
-    #
-    # smoke_num = to_df(smoke_num)
-    # d = crawl_pct()
-    # print(d)
-    map = crawl_map()
+    map_id = crawl_map()
     print(map)
