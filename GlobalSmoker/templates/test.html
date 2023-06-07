@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+
+<style>
+    html {
+  font-size: 5px;
+}
+* {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+body{
+    background-color: #000;
+}
+body {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  font-family: Helvetica;
+  flex-direction: column;
+}
+.title{
+  position: fixed;
+  position: relative;
+  width: 100%;
+  height: 45px;
+  background-color: #444857d9;
+  border-bottom: 3px white solid;
+}
+  .context{
+    display: flex;
+    height: 750px;
+    width: 100%;
+    .daohanglan{flex: 2;}
+    .world{flex: 8;}
+  }
+  .daohanlan{
+    position: relative;
+
+  }
+h1 {
+  position: relative;
+  top: 9px;
+  left: 5px;
+  color: white;
+  font-size: 5rem;
+}
+
+
+span {
+  display: inline-block;
+}
+
+
+h1.animate span {
+  animation-name: var(--animation);
+  animation-duration: .4s;
+  animation-timing-function: ease-in-out;
+  animation-delay: var(--delay);
+}
+
+
+@keyframes jump {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+
+@keyframes pop {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+
+@keyframes flip {
+  0%, 100% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(90deg);
+  }
+}
+
+
+@keyframes blink {
+  0%, 100% {
+    color: inherit;
+  }
+  50% {
+    color:orange;
+  }
+}
+.shell{
+            position:fixed;
+            position: relative;
+            top: 5px;
+            width: 280px;
+            height: 450px;
+            background-color: #444857d9;
+            border-radius: 2%;
+            border: 0.5px white solid;
+            border-left:none ;
+        }
+        .buttons{
+            margin: 60px 0;
+            color: #fff;
+        }
+        .li{
+            letter-spacing: 2px;
+            font: 600 17px '';
+            padding: 16px 52px;
+            transition: .3s;
+            border-radius: 0 2% 2% 0;
+        }
+        .li::after{
+            content: '';
+            position: absolute;
+            left: 20px;
+            margin-top: -22px;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 50%;
+        }
+        .buttons>li:hover{
+            background-color: #beb5df;
+        }
+
+        .li ul{
+            width: 0;
+            height: 330px;
+            padding: 60px 0;
+            position: absolute;
+            top: 0;
+            right: 0;
+            overflow: hidden;
+            background-color: #59699b;
+            transition: .3s;
+            border-radius: 0 2% 2% 0;
+        }
+
+
+        .li ul li{
+            padding: 16px 24px;
+            transition: .3s;
+        }
+
+
+        .li:hover ul{
+            width: 228px;
+            border-radius: 0 2% 2% 0;
+        }
+        .li ul li:hover{
+            background-color: #828eb9;
+            border-radius: 0 2% 2% 0;
+        }
+        #world{
+          left: 20px;
+          background-color:#444857d9;
+          height: 650px;
+          width: 70%;
+          border: 1px white solid
+        }
+</style>
+
+
+<body>
+  <div class="title">
+    <h1>CodingStartup.class</h1>
+  </div>
+  <div class="context">
+    <div class="daohanlan">
+      <nav class="shell">
+          <ul class="buttons">
+              <li class="li">
+                  首页
+                  <ul>
+                      <li data-animation="blink">全球吸烟总图(2010) </li>
+                      <li data-animation="pop">全球吸烟总图(2011) </li>
+                      <li data-animation="jump">全球吸烟总图(2012) </li>
+                      <li>全球吸烟总图(2013) </li>
+                      <li>全球吸烟总图(2014) </li>
+                  </ul>
+              </li>
+
+              <li class="li">
+                  发达不发达国家对比
+                  <ul>
+                      <li>....   </li>
+                      <li>....</li>
+                      <li>stock        </li>
+                      <li>mail         </li>
+                      <li>return goods </li>
+                  </ul>
+              </li>
+
+              <li class="li">
+                  吸烟总数变化
+                  <ul>
+                      <li>Release baby   </li>
+                      <li>Posting Details</li>
+                      <li>Shop decoration</li>
+                  </ul>
+              </li>
+
+              <li class="li">
+                  结论总结及预测
+                  <ul>
+                      <li>payment              </li>
+                      <li>Loan goods           </li>
+                      <li>Collection in advance</li>
+                  </ul>
+              </li>
+          </ul>
+      </nav>
+    </div>
+    <div id="world" class="world"></div>
+  </div>
+</body>
+<script src="echarts.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+<script>
+    const h1 = document.querySelector('h1')
+    h1.innerHTML = h1.textContent.replace(/\S/g, "<span>$&</span>")
+
+
+    document.querySelectorAll('span').forEach((span, index) => {
+        span.style.setProperty('--delay', `${index * 0.1}s`)
+    })
+
+
+    document.querySelectorAll('li').forEach(button => {
+        button.addEventListener('click', e => {
+        h1.style.setProperty('--animation', e.target.getAttribute('data-animation'))
+
+         h1.classList.remove('animate')
+        void h1.offsetWidth
+         h1.classList.add('animate')
+         })
+    })
+
+    var myChart = echarts.init(document.getElementById('world'));
+     let nameMap = '世界地图.txt'
+     option = {
+         tooltip: {
+             trigger: 'item',
+             formatter: function (params) {
+                 console.log(params)
+                 if (params.name) {
+                     return params.name + ' : ' + (isNaN(params.value) ? 0 : parseInt(params.value));
+                 }
+             }
+         },
+         // 视觉映射组件
+         visualMap: {
+
+
+             type: 'continuous', // continuous 类型为连续型  piecewise 类型为分段型
+             show: true, // 显示 visualMap-continuous 组件 如果设置为 false，不会显示，但是数据映射的功能还存在
+             // 指定 visualMapContinuous 组件的允许的最小/大值。'min'/'max' 必须用户指定。
+             // [visualMap.min, visualMax.max] 形成了视觉映射的『定义域』
+             // 文本样式
+             min:0,
+             max:100000000,
+             textStyle: {
+                 fontSize: 15,
+                 color: '#fff'
+             },
+             realtime: false, // 拖拽时，是否实时更新
+             calculable: true, // 是否显示拖拽用的手柄
+             // 定义 在选中范围中 的视觉元素
+             inRange: {
+                 color: ['rgb(243, 228, 71)', 'rgb(233, 178, 59)', 'rgb(232, 163, 14)', 'rgb(232, 116, 14)', 'rgb(232, 94, 14)', 'rgb(234, 112, 5)'] // 图元的颜色
+             }
+         },
+         series: [
+             {
+                 name: 'World Population (2010)',
+                 type: 'map',
+                 mapType: 'world',
+                 roam: true,
+                 itemStyle: {
+                     areaColor: 'orange', // 地图区域的颜色 如果设置了visualMap，areaColor属性将不起作用
+                     borderWidth: 0.5, // 描边线宽 为 0 时无描边
+                     borderColor: '#000', // 图形的描边颜色 支持的颜色格式同 color，不支持回调函数
+                     borderType: 'solid', // 描边类型，默认为实线，支持 'solid', 'dashed', 'dotted'
+                     emphasis: {label: {show: true}}
+                 },
+                 label: {
+                     show: false // 是否显示对应地名
+                 },
+                 data: "",
+                 nameMap: nameMap
+             }
+         ]
+     };
+     myChart.setOption(option);
+</script>
+</html>
