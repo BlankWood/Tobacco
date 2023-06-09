@@ -19,20 +19,22 @@ def main_html():
 def get_global(year):
     """
     根据年份返回全部的地区吸烟人数数据
-    :param year: 年份
+    :param year: 年份. 为 0 ,则取 1991-2019 的奇数年份.
     :return: 列表, 元素为字典, [{name: , value: }]
     """
-    return readF.read(year)
+    data = readF.read(year, "All")
+    return data
 
 
-@app.route('/dist_<int:year>')
-def get_dist(year):
+@app.route('/region_<region>')
+def get_region(region):
     """
-    根据年份返回特定地区的吸烟人数数据, 地区在 readFile 中设置
-    :param year:
+    返回特定地区的吸烟人数数据, 为 1991-2019 的奇数年份.
+    :param region: 地区, 在 readFile 中设置
     :return:
     """
-    return readF.read(year, Global=False)
+    data = readF.read(0, district=region)
+    return data
 
 
 @app.route('/plot', methods=["POST"])
@@ -61,11 +63,18 @@ def get_plot():
     """
     data = request.json
     years = data.get("years", [])
-    result = readF.read(years, Global=False)
+    result = readF.read(years)
     return result
 
 
-if __name__ == "__main__":
-    app.run()
+@app.route('/test')
+def test():
+    # return [{'color': 'blue', 'num': 10}, {'color': 'red', 'num': 20}]
+    return [['color', 'num'], ['blue', 10], ['red', 20]]
 
+
+if __name__ == "__main__":
+    # 当 debug=True 时, 不用重新启动, 只需保存, 即可在页面中运行修改后的代码
+    app.run(debug=True)
+    # print(get_region("Asia"))
 
