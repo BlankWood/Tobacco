@@ -19,53 +19,43 @@ def main_html():
 def get_global(year):
     """
     根据年份返回全部的地区吸烟人数数据
-    :param year: 年份
+    :param year: 年份. 为 0 ,则取 1991-2019 的奇数年份.
     :return: 列表, 元素为字典, [{name: , value: }]
     """
-    return readF.read(year)
+    data = readF.read(year, "All")
+    return data
 
 
-@app.route('/dist_<int:year>')
-def get_dist(year):
+@app.route('/region_<region>')
+def get_region(region):
     """
-    根据年份返回特定地区的吸烟人数数据, 地区在 readFile 中设置
-    :param year:
+    返回特定地区的吸烟人数数据, 为 1991-2019 的奇数年份.
+    :param region: 地区, 在 readFile 中设置
     :return:
     """
-    return readF.read(year, Global=False)
+    data = readF.read(0, region=region)
+    return data
 
 
-@app.route('/plot', methods=["POST"])
-def get_plot():
+@app.route('/pie_<region>')
+def get_pie(region):
     """
-    $("#getData").click(function () {
-        var requestData = { numbers: [1, 2, 3, 4, 5] };
-
-        // 发送 AJAX 请求
-        $.ajax({
-          method: "POST",
-          url: "/api/v1/data",
-          contentType: "application/json",
-          data: JSON.stringify(requestData),
-        })
-          .done(function (response) {
-            $("#result").text(`结果：${response.result}`);
-          })
-          .fail(function () {
-            alert("请求失败!");
-          });
-      });
-
-    通过 post 获取需要的年份, 返回对应年份特定地区的数据
+    获取2019年, 特定地区的数据
     :return:
     """
-    data = request.json
-    years = data.get("years", [])
-    result = readF.read(years, Global=False)
-    return result
+    result = readF.read(year=2019, region=region)
+    data = readF.get_color(result)
+    return data
+
+
+@app.route('/test')
+def test():
+    # return [{'color': 'blue', 'num': 10}, {'color': 'red', 'num': 20}]
+    return [['color', 'num'], ['blue', 10], ['red', 20]]
 
 
 if __name__ == "__main__":
-    app.run()
-
+    # 当 debug=True 时, 不用重新启动, 只需保存, 即可在页面中运行修改后的代码
+    app.run(debug=True)
+    # print(get_region("Asia"))
 
