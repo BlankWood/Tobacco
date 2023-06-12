@@ -55,7 +55,6 @@ def test():
 
 
 if __name__ == "__main__":
-    # 当 debug=True 时, 不用重新启动, 只需保存, 即可在页面中运行修改后的代码
-    app.run(debug=True)
-    # print(get_region("Asia"))
+    app.run()
+
 
