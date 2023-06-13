@@ -13,7 +13,7 @@ district_id = [5, 9, 31, 64, 103, 137, 158, 166]
 # Africa_name = ['Egypt', 'Congo', 'Madagascar']
 Asia_name = ["China", "Indonesia", "Japan", "India", "Singapore", "Russia"]
 Europe_name = ["France", 'Germany', 'United Kingdom', 'Denmark', 'Finland', 'Netherlands']
-North_America = ['Canada', 'Mexico', 'United States', 'Salvador', 'Guatemala,', 'Panama','Greenland']
+North_America = ['Canada', 'Mexico', 'United States', 'El Salvador', 'Panama', 'Greenland']
 South_America = ['Argentina', 'Chile', 'Brazil', 'Bolivia (Plurinational State of)', 'Paraguay', 'Uruguay']
 Africa_name = ['Egypt', 'Congo', 'Madagascar', 'Morocco', 'Zambia', 'South Africa']
 
@@ -54,7 +54,7 @@ def read(year=2019, region="All"):
     smoker = pd.read_csv("IHME_1990_2019_SMOKERS.CSV")
 
     # 通用筛选
-    smoker = smoker.loc[(smoker.sex_id == 3) & (smoker.sex_name == "Both")]
+    smoker = smoker.loc[(smoker.sex_id == 3)]
 
     # 地区筛选: 各国或地区
     if region != "All":
@@ -80,6 +80,14 @@ def read(year=2019, region="All"):
         smoker = to_list(smoker)
 
     return smoker
+
+
+def get_pct():
+    pct = pd.read_csv("global_pct.csv")
+    pct = pct.loc[:, ('name', 'value')]
+    pct.value = pct.value.map(lambda x: x * 100)
+    pct = pct.to_dict(orient='records')
+    return pct
 
 
 def to_list(data):
@@ -124,11 +132,29 @@ def get_global():
     return data
 
 
+def sort_gender(year):
+    """
+    根据年份返回对应的男女吸烟人数
+    :param year:
+    :return:
+    """
+    data = pd.read_csv("IHME_1990_2019_SMOKERS.CSV")
+    data = data.loc[(data.sex_name.isin(['Male', 'Female'])) & (data.location_name == 'Global') & (data.year_id == year)]
+    data = data.loc[:, ('sex_name', 'val')]
+    data['val'] = data.val.map(lambda x: int(x / shrink))
+    data.columns = ['name', 'value']
+    return data.to_dict(orient='records')
+
+
 if __name__ == "__main__":
     # smokers = read([0], )
     # smokers = smokers.to_json()
     # print(smokers)
 
-    d = read(2019, region="Asia")
-    d = get_color(d)
-    print(d)
+    # d = read(2019, region="Asia")
+    # d = get_color(d)
+    # print(d)
+
+    print(sort_gender(2019))
+
+

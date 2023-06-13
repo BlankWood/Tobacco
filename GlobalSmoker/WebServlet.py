@@ -37,15 +37,25 @@ def get_region(region):
     return data
 
 
-@app.route('/pie_<region>')
-def get_pie(region):
+@app.route('/pie_<int:year>')
+def get_pie(year):
     """
     获取2019年, 特定地区的数据
     :return:
     """
-    result = readF.read(year=2019, region=region)
-    data = readF.get_color(result)
+    # result = readF.read(year=2019, region=region)
+    # data = readF.get_color(result)
+    data = readF.sort_gender(year)
     return data
+
+
+@app.route('/pct')
+def get_pct():
+    """
+
+    :return:
+    """
+    return readF.get_pct()
 
 
 @app.route('/test')
@@ -55,6 +65,8 @@ def test():
 
 
 if __name__ == "__main__":
-    app.run()
+    # app.run()
+    app.run(debug=True)
+    # print(get_pie("Asia"))
 
 

@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 
 
-def crawl_pct():
+def crawl_pct(year=0):
     """
     爬取吸烟率信息
     :return: 吸烟率列表
@@ -31,13 +31,14 @@ def crawl_pct():
     data = response.json()['data']['model']
 
     data_list = []
+    world_map = crawl_map()
 
     for key in data.keys():
         years = data[key]
-        data_dict = {'name': key}
-        for year in range(2010, 2016):
-            mean = years[str(year)]['22']['3']['prevalence']['pct']['mean']
-            data_dict[str(year)] = mean
+        data_dict = {'name': world_map[key]}
+        # for year in range(2010, 2016):
+        mean = years[str(year)]['22']['3']['prevalence']['pct']['mean']
+        data_dict['value'] = mean
 
         data_list.append(data_dict)
 
@@ -99,8 +100,13 @@ def print_format(data):
         print("{name: '"+item['name']+"', value: "+str(item['value'])+"},")
 
 
+def save(data):
+    data = pd.DataFrame(data)
+    data.to_csv('global_pct.csv')
+
+
 if __name__ == "__main__":
     # 启动程序 main()
     # map_id = crawl_map()
     # print(map_id)
-    print(crawl_pct())
+    save(crawl_pct(2015))

@@ -438,6 +438,7 @@
                             <li class="map" data-animation="jump" id="data_2009" data-param="2009"> 2009 </li>
                             <li class="map" data-animation="blink" id="data_2014" data-param="2014"> 2014 </li>
                             <li class="map" data-animation="pop" id="data_2019" data-param="2019"> 2019 </li>
+                            <li class="pct" data-animation="pop" id="pct_data"> 吸烟率 </li>
                         </ul>
                     </li>
 
@@ -445,6 +446,7 @@
                     <li class="li">
                         各地区人数变化
                         <ul>
+                            <li id="refresh">重置</li>
                             <li class="bar" data-animation="blink" id="get-data4" data-param='Asia'> 亚洲 </li>
                             <li class="bar" data-animation="blink" id="get-data5" data-param='Africa'>非洲</li>
                             <li class="bar" data-animation="blink" id="get-data6" data-param='Europe'>欧洲 </li>
@@ -455,13 +457,13 @@
 
 
                     <li class="li">
-                        各国人数占比
+                        全球男女吸烟人数
                         <ul>
-                            <li class="pie" data-param='Asia'> 亚洲 </li>
-                            <li class="pie" data-param='Africa'>非洲</li>
-                            <li class="pie" data-param='Europe'>欧洲 </li>
-                            <li class="pie" data-param='North-America'>北美洲 </li>
-                            <li class="pie" data-param='South-America'>南美洲 </li>
+                            <li class="pie" data-param='1999'> 1999 </li>
+                            <li class="pie" data-param='2004'> 2004 </li>
+                            <li class="pie" data-param='2009'> 2009 </li>
+                            <li class="pie" data-param='2014'> 2014 </li>
+                            <li class="pie" data-param='2019'> 2019 </li>
                         </ul>
                     </li>
 
@@ -469,9 +471,9 @@
                     <li class="li">
                         结论总结及预测
                         <ul>
-                            <li>payment </li>
-                            <li>Loan goods </li>
-                            <li>Collection in advance</li>
+                            <li> payment </li>
+                            <li> Loan goods </li>
+                            <li> Collection in advance</li>
                         </ul>
                     </li>
                 </ul>
@@ -522,13 +524,16 @@
 
     var data_map;
     var data_bar;
-    var data_pie
+    var data_pie;
+    var max_value;
 
+    <!--  网页数据初始化函数  -->
     function init_data(){
         $.ajax({
           url: '/map_1999',
           type: "GET",
           success: function (response) {
+            max_value = 500000;
             data_map = response;
             chart();
           }
@@ -542,7 +547,7 @@
           }
         });
         $.ajax({
-          url: 'pie_Asia',
+          url: 'pie_1999',
           type: "GET",
           success: function (response) {
                 data_pie = response;
@@ -553,6 +558,7 @@
 
     window.onload = init_data;
 
+    <!-- 世界地图数据请求 -->
     $(document).ready(function () {
       $(".map").click(function () {
         var param = $(this).data("param");
@@ -561,13 +567,16 @@
           url: urlStr,
           type: "GET",
           success: function (response) {
-            a = response;
+          max_value = 500000;
+            data_map = response;
+<!--            console.log(data_map);-->
             chart();
           }
         });
       });
     });
 
+    <!--  3D柱状图数据请求  -->
     $(document).ready(function () {
       $(".bar").click(function () {
         var param = $(this).data("param");
@@ -583,6 +592,7 @@
       });
     });
 
+    <!-- 饼图数据请求 -->
     $(document).ready(function () {
       $(".pie").click(function () {
         var param = $(this).data("param");
@@ -598,74 +608,97 @@
       });
     });
 
+    <!-- 吸烟率数据请求 -->
+    $(document).ready(function () {
+      $(".pct").click(function () {
+        $.ajax({
+          url: '/pct',
+          type: "GET",
+          success: function (response) {
+                max_value = 50;
+                data_map = response;
+                console.log(data_map)
+                chart();
+          }
+        });
+      });
+    });
 
- function chart(){
-    var myChart = echarts.init(document.getElementById('world'));
-    let nameMap = '世界地图.txt'
-    option = {
-        tooltip: {
-            trigger: 'item',
-            formatter: function (params) {
-                console.log(params)
-                if (params.name) {
-                    return params.name + ' : ' + (isNaN(params.value) ? 0 : parseInt(params.value));
+    <!--  页面刷新函数  -->
+    $(document).ready(function () {
+          $("#refresh").click(function () {
+                location.reload();
+          });
+    });
+
+    <!-- 绘制世界地图函数 -->
+     function chart(){
+        var myChart = echarts.init(document.getElementById('world'));
+        let nameMap = '世界地图.txt'
+        option = {
+            tooltip: {
+                trigger: 'item',
+                formatter: function (params) {
+                    console.log(params)
+                    if (params.name) {
+                        return params.name + ' : ' + (isNaN(params.value) ? 0 : parseInt(params.value));
+                    }
                 }
-            }
-        },
-        layoutCenter: ['40%', '50%'],//位置
-        layoutSize: '200%',//大小
-        aspectScale: 0.8, //宽高比
-        // 视觉映射组件
-        grid: {
-            left: '40%',
-            right: '40%',
-            bottom: '3%',
-            containLabel: true
-        },
-        visualMap: {
-            type: 'continuous', // continuous 类型为连续型  piecewise 类型为分段型
-            show: true, // 显示 visualMap-continuous 组件 如果设置为 false，不会显示，但是数据映射的功能还存在
-            // 指定 visualMapContinuous 组件的允许的最小/大值。'min'/'max' 必须用户指定。
-            // [visualMap.min, visualMax.max] 形成了视觉映射的『定义域』
-            // 文本样式
-            min: 0,
-            max: 500000,
-            textStyle: {
-                fontSize: 15,
-                color: '#fff'
             },
-            realtime: false, // 拖拽时，是否实时更新
-            calculable: true, // 是否显示拖拽用的手柄
-            // 定义 在选中范围中 的视觉元素
-            inRange: {
-                color: ['rgb(243, 228, 71)', 'rgb(233, 178, 59)', 'rgb(232, 163, 14)', 'rgb(232, 116, 14)', 'rgb(232, 94, 14)', 'rgb(234, 112, 5)'] // 图元的颜色
-            }
-        },
-        series: [
-            {
-                name: 'World Population (2010)',
-                type: 'map',
-                mapType: 'world',
-                roam: true,
-                itemStyle: {
-                    areaColor: 'orange', // 地图区域的颜色 如果设置了visualMap，areaColor属性将不起作用
-                    borderWidth: 0.5, // 描边线宽 为 0 时无描边
-                    borderColor: '#000', // 图形的描边颜色 支持的颜色格式同 color，不支持回调函数
-                    borderType: 'solid', // 描边类型，默认为实线，支持 'solid', 'dashed', 'dotted'
-                    emphasis: { label: { show: true } }
+            layoutCenter: ['40%', '50%'],//位置
+            layoutSize: '200%',//大小
+            aspectScale: 0.8, //宽高比
+            // 视觉映射组件
+            grid: {
+                left: '40%',
+                right: '40%',
+                bottom: '3%',
+                containLabel: true
+            },
+            visualMap: {
+                type: 'continuous', // continuous 类型为连续型  piecewise 类型为分段型
+                show: true, // 显示 visualMap-continuous 组件 如果设置为 false，不会显示，但是数据映射的功能还存在
+                // 指定 visualMapContinuous 组件的允许的最小/大值。'min'/'max' 必须用户指定。
+                // [visualMap.min, visualMax.max] 形成了视觉映射的『定义域』
+                // 文本样式
+                min: 0,
+                max: max_value,
+                textStyle: {
+                    fontSize: 15,
+                    color: '#fff'
                 },
-                label: {
-                    show: false // 是否显示对应地名
-                },
-                data: data_map,
-                nameMap: nameMap
-            }
-        ]
-    };
-    myChart.setOption(option);
-}
+                realtime: false, // 拖拽时，是否实时更新
+                calculable: true, // 是否显示拖拽用的手柄
+                // 定义 在选中范围中 的视觉元素
+                inRange: {
+                    color: ['rgb(243, 228, 71)', 'rgb(233, 178, 59)', 'rgb(232, 163, 14)', 'rgb(232, 116, 14)', 'rgb(232, 94, 14)', 'rgb(234, 112, 5)'] // 图元的颜色
+                }
+            },
+            series: [
+                {
+                    name: 'World Population (2010)',
+                    type: 'map',
+                    mapType: 'world',
+                    roam: true,
+                    itemStyle: {
+                        areaColor: 'orange', // 地图区域的颜色 如果设置了visualMap，areaColor属性将不起作用
+                        borderWidth: 0.5, // 描边线宽 为 0 时无描边
+                        borderColor: '#000', // 图形的描边颜色 支持的颜色格式同 color，不支持回调函数
+                        borderType: 'solid', // 描边类型，默认为实线，支持 'solid', 'dashed', 'dotted'
+                        emphasis: { label: { show: true } }
+                    },
+                    label: {
+                        show: false // 是否显示对应地名
+                    },
+                    data: data_map,
+                    nameMap: nameMap
+                }
+            ]
+        };
+        myChart.setOption(option);
+    }
 
-
+    <!-- 绘制饼图函数 -->
     function chart_pie(){
         var chartDom = document.getElementById('shanxingtu');
         var myChart1 = echarts.init(chartDom);
@@ -673,7 +706,7 @@
 
         option = {
             title: {
-                text: '2019年对应地区各国吸烟人数占比',
+                text: '全球男女吸烟人数',
                 left: 'center',
                 top: 2,
                 textStyle: {
@@ -686,21 +719,19 @@
             visualMap: {
                 show: false,
                 min: 80,
-                max: 500000,
+                max: 1000000,
                 inRange: {
                     colorLightness: [0, 1]
                 }
             },
-            color: ['rgb(243, 228, 71)', 'rgb(233, 178, 59)', 'rgb(232, 163, 14)', 'rgb(232, 116, 14)', 'rgb(232, 94, 14)', 'rgb(234, 112, 5)'],
+<!--            color: ['rgb(243, 228, 71)', 'rgb(233, 178, 59)', 'rgb(232, 163, 14)', 'rgb(232, 116, 14)', 'rgb(232, 94, 14)', 'rgb(234, 112, 5)'],-->
             series: [
                 {
                     name: '吸烟人数',
                     type: 'pie',
                     radius: '80%',
                     center: ['50%', '60%'],
-                    data: data_pie.sort(function (a, b) {
-                        return a.value - b.value;
-                    }),
+                    data: data_pie,
                     roseType: 'radius',
                     label: {
                     },
@@ -727,6 +758,7 @@
         option && myChart1.setOption(option);
     }
 
+    <!--  绘制3D柱状图函数, 有官方bug?  -->
     function chart_bar(){
         var chartDom1 = document.getElementById('zhuzhuangtu');
         var myChart2 = echarts.init(chartDom1);
@@ -797,44 +829,181 @@
     var myChartPlot = echarts.init(chart_plot);
     var option_plot;
 
+    <!--  折线图  -->
+    var app = {};
 
-    option_plot = {
-         legend: {
-            data: ['全球吸烟总数 单位: K']
-         },
-        title: {
-            text: '全球吸烟人数统计'
+    var chartDom = document.getElementById('zhexiantu');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    const posList = [
+        'left',
+        'right',
+        'top',
+        'bottom',
+        'inside',
+        'insideTop',
+        'insideLeft',
+        'insideRight',
+        'insideBottom',
+        'insideTopLeft',
+        'insideTopRight',
+        'insideBottomLeft',
+        'insideBottomRight'
+    ];
+    app.configParameters = {
+        rotate: {
+            min: -90,
+            max: 90
         },
+        align: {
+            options: {
+                left: 'left',
+                center: 'center',
+                right: 'right'
+            }
+        },
+        verticalAlign: {
+            options: {
+                top: 'top',
+                middle: 'middle',
+                bottom: 'bottom'
+            }
+        },
+        position: {
+            options: posList.reduce(function (map, pos) {
+                map[pos] = pos;
+                return map;
+            }, {})
+        },
+        distance: {
+            min: 0,
+            max: 100
+        }
+    };
+    app.config = {
+        rotate: 0,
+        align: 'center',
+        verticalAlign: 'bottom',
+        position: 'inside',
+        distance: 0,
+        onChange: function () {
+            const labelOption = {
+                rotate: app.config.rotate,
+                align: app.config.align,
+                verticalAlign: app.config.verticalAlign,
+                position: app.config.position,
+                distance: app.config.distance
+            };
+            myChart.setOption({
+                series: [
+                    {
+                        label: labelOption
+                    },
+                    {
+                        label: labelOption
+                    },
+                    {
+                        label: labelOption
+                    },
+                    {
+                        label: labelOption
+                    }
+                ]
+            });
+        }
+    };
+    const labelOption = {
+        show: true,
+        position: app.config.position,
+        distance: app.config.distance,
+        align: app.config.align,
+        verticalAlign: app.config.verticalAlign,
+        rotate: app.config.rotate,
+<!--        formatter: '{c}  {name|{a}}',-->
+        formatter: '{c}',
+        fontSize: 10,
+        rich: {
+            name: {}
+        }
+    };
+    option = {
         tooltip: {
-            trigger: 'axis'
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            }
         },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
+        legend: {
+            data: ['男性人口', '男性吸烟人数', '女性人口', '女性吸烟人数']
         },
-        xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            data: ['1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999','2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019']        },
-        yAxis: {
-            type: 'value',
-            max: 1200000,
-            min: 900000,
+        toolbox: {
+            show: true,
+            orient: 'vertical',
+            left: 'right',
+            top: 'center',
+            feature: {
+                mark: { show: true },
+                dataView: { show: true, readOnly: false },
+                magicType: { show: true, type: ['line', 'bar', 'stack'] },
+                restore: { show: true },
+                saveAsImage: { show: true }
+            }
         },
+        xAxis: [
+            {
+                type: 'category',
+                axisTick: { show: false },
+                data: ['2012', '2013', '2014', '2015', '2016']
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
         series: [
             {
-                name: '全球吸烟总数 单位: K',
-                data: [992250, 1004434, 1015217, 1024669, 1032566, 1039658, 1045948, 1051280, 1056125, 1060588, 1064935, 1069658, 1074846, 1080740, 1087132, 1094223, 1101548, 1109531, 1115992, 1122395, 1127518, 1131118, 1132823, 1132094, 1131104, 1130416, 1131316, 1133641, 1138485, 1144818],
-                type: 'line',
-                areaStyle: {}
+                name: '男性人口',
+                type: 'bar',
+                barGap: 0,
+                label: labelOption,
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [3037000, 3239000, 3447000, 3660000, 3873000]
+            },
+            {
+                name: '男性吸烟人数',
+                type: 'bar',
+                label: labelOption,
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [858267, 880644, 914975, 931753, 950517]
+            },
+            {
+                name: '女性人口',
+                type: 'bar',
+                label: labelOption,
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [2995000, 3190000, 3390000, 3599000, 3808000]
+            },
+            {
+                name: '女性吸烟人数',
+                type: 'bar',
+                label: labelOption,
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [202321, 206488, 207419, 199350, 194300]
             }
         ]
     };
 
-
-    option_plot && myChartPlot.setOption(option_plot);
+    option && myChart.setOption(option);
 
 
 </script>
