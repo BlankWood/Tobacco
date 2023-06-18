@@ -6,7 +6,8 @@ import pandas as pd
 
 def crawl_pct(year=0):
     """
-    爬取吸烟率信息
+    爬取特定年份的吸烟率信息, 如果为 0, 则爬取 2010-2016.
+    :param year: 年份
     :return: 吸烟率列表
     """
 
@@ -18,10 +19,6 @@ def crawl_pct(year=0):
                 'metric2': 'prevalence',
                 'cache': 'false'
                }
-
-    headers = {
-
-    }
 
     response = requests.post(url, data=payload)
 
@@ -36,9 +33,13 @@ def crawl_pct(year=0):
     for key in data.keys():
         years = data[key]
         data_dict = {'name': world_map[key]}
-        # for year in range(2010, 2016):
-        mean = years[str(year)]['22']['3']['prevalence']['pct']['mean']
-        data_dict['value'] = mean
+        if year == 0:
+            for year in range(2010, 2016):
+                mean = years[str(year)]['22']['3']['prevalence']['pct']['mean']
+                data_dict['value'] = mean
+        else:
+            mean = years[str(year)]['22']['3']['prevalence']['pct']['mean']
+            data_dict['value'] = mean
 
         data_list.append(data_dict)
 
@@ -57,12 +58,12 @@ def crawl_map():
 
 def crawl(year=2010):
     """
-    爬取主数据的方法
+    根据年份爬取吸烟人数数据
     :param year: 年份
     :return: 吸烟人数数量的列表
     """
 
-    # 数据url 和 headers ,  headers可以在随便一个数据包的标头中找到.
+    # 数据请求 url 和 headers.
     data_url = "https://vizhub.healthdata.org/tobacco/php/getYearData.php"
     header = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -75,7 +76,7 @@ def crawl(year=2010):
     # post请求
     response = requests.post(data_url, headers=header, data=payload)
 
-    # 提取数据的 key值 和 有效数的位置 据根据网站本身的设计而改变
+    # 根据数据的 key值提取有效数据
     # 转json并提取部分数据
     data = response.json()['data']['model']
     data_list = []
@@ -109,4 +110,9 @@ if __name__ == "__main__":
     # 启动程序 main()
     # map_id = crawl_map()
     # print(map_id)
-    save(crawl_pct(2015))
+    # save(crawl_pct(2015))
+
+    for year in range(2000, 2020):
+        for i in crawl_pct(year):
+            if i['name'] == 'Global':
+                print(i['value'])

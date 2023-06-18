@@ -67,6 +67,6 @@ def test():
 if __name__ == "__main__":
     # app.run()
     app.run(debug=True)
-    # print(get_pie("Asia"))
+    # print(get_pie(1999))
 
 
