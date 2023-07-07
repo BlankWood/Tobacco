@@ -1,5 +1,6 @@
 import numpy
-import pandas as pd
+from pandas import DataFrame as DF, read_csv
+
 
 # 地区ID
 district_id = [5, 9, 31, 64, 103, 137, 158, 166]
@@ -45,7 +46,7 @@ def read(year=0, region="All"):
     """
 
     # 读文件
-    smoker = pd.read_csv("IHME_1990_2019_SMOKERS.CSV")
+    smoker = read_csv("IHME_1990_2019_SMOKERS.CSV")
 
     # 通用筛选
     smoker = smoker.loc[(smoker.sex_id == 3)]
@@ -77,7 +78,8 @@ def read(year=0, region="All"):
 
 
 def get_pct():
-    pct = pd.read_csv("global_pct.csv")
+
+    pct = read_csv("global_pct.csv")
     pct = pct.loc[:, ('name', 'value')]
     pct.value = pct.value.map(lambda x: x * 100)
     pct = pct.to_dict(orient='records')
@@ -114,7 +116,7 @@ def get_color(data):
 
 def get_global(is_shrink=True):
 
-    data = pd.read_csv("IHME_1990_2019_SMOKERS.CSV")
+    data = read_csv("IHME_1990_2019_SMOKERS.CSV")
     data = data.loc[(data.sex_id == 3) & (data.location_name == 'Global') & (data.sex_name == "Both")]
     data = data.loc[:, "val"]
     if is_shrink:
@@ -129,7 +131,7 @@ def sort_gender(year):
     :param year:
     :return:
     """
-    data = pd.read_csv("IHME_1990_2019_SMOKERS.CSV")
+    data = read_csv("IHME_1990_2019_SMOKERS.CSV")
     data = data.loc[(data.sex_name.isin(['Male', 'Female'])) & (data.location_name == 'Global') & (data.year_id == year)]
     data = data.loc[:, ('sex_name', 'val')]
     data['val'] = data.val.map(lambda x: int(x / shrink))
@@ -138,10 +140,10 @@ def sort_gender(year):
 
 
 if __name__ == "__main__":
-    # smokers = read(year=2019, region="All")
+    smokers = read(year=2019, region="All")
     # smokers = smokers.to_json()
-    # for i in smokers:
-    #     print(i)
+    for i in smokers:
+        print(i)
 
     # d = read(2019, region="Asia")
     # d = get_color(d)
@@ -150,10 +152,10 @@ if __name__ == "__main__":
     # for year in range(2010, 2020):
     #     print(sort_gender(year))
 
-    data_global = get_global()
-    data_global_ = get_global(False)
-    for i in range(0, len(data_global)):
-        print("处理前:", data_global_[i], "处理后:", data_global[i])
+    # data_global = get_global()
+    # data_global_ = get_global(False)
+    # for i in range(0, len(data_global)):
+    #     print("处理前:", data_global_[i], "处理后:", data_global[i])
 
     # print(get_pct())
 

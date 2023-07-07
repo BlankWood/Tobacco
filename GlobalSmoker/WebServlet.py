@@ -1,5 +1,5 @@
 import readFile as readF
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
